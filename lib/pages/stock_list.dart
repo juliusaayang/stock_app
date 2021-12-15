@@ -8,34 +8,52 @@ import 'package:stock/models/stock_list.dart';
 import 'package:stock/services/stock_service.dart';
 
 class Stocks extends StatefulWidget {
-  const Stocks({Key key}) : super(key: key);
+  Stocks({this.stockData});
+  final stockData;
 
   @override
   _StocksState createState() => _StocksState();
 }
 
 class _StocksState extends State<Stocks> {
-  StockService get service => GetIt.I<StockService>();
+  StockService stocks = StockService();
+  String ticker;
+  String tickerName;
+  String currencyName;
+  int length;
+  int index;
 
-  APIResponse<List<StockListing>> _apiResponse;
-  bool _isLoading = false;
+  
+  
+    
 
   @override
   void initState() {
-    _fetchStocks();
+    updateUI(widget.stockData);
     super.initState();
   }
 
-  _fetchStocks() async {
-    setState(
-      () => _isLoading = true,
-    );
+  void updateUI(dynamic tickerData) {
+    setState(() {
+      if (tickerData == null) {
+        ticker = 'No value';
+        tickerName = 'No value';
+        currencyName = 'Us';
+        length = 0;
+        return;
+      }
+      var tick = tickerData['results'][0]['ticker'];
+      ticker = tick;
 
-    _apiResponse = await service.getTickerData();
+      var name = tickerData['results'][0]['name'];
+      tickerName = name;
 
-    setState(
-      () => _isLoading = false,
-    );
+      var currency = tickerData['results'][0]['currency_name'];
+      currencyName = currency;
+
+      var count = tickerData['count'];
+      length = count;
+    });
   }
 
   @override
@@ -44,29 +62,17 @@ class _StocksState extends State<Stocks> {
       appBar: AppBar(),
       body: Builder(
         builder: (_) {
-          if (_isLoading) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (_apiResponse.error) {
-            return Center(
-              child: Text(_apiResponse.errorMessage),
-            );
-          }
-
           return ListView.separated(
             itemBuilder: (_, index) {
               return ListTile(
                 title: Text(
-                  _apiResponse.data[index].tickerName,
+                  tickerName,
                 ),
                 subtitle: Text(
-                  _apiResponse.data[index].ticker,
+                  ticker,
                 ),
                 leading: Text(
-                  _apiResponse.data[index].currency,
+                  currencyName,
                 ),
               );
             },
@@ -76,7 +82,7 @@ class _StocksState extends State<Stocks> {
                 color: Colors.blue,
               );
             },
-            itemCount: _apiResponse.data.length,
+            itemCount: length,
           );
         },
       ),
