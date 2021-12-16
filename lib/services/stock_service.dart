@@ -8,6 +8,8 @@ import 'package:stock/services/networking.dart';
 const apiKey = 'eOCFJBzA6Pykt62Zq5MFBGXKIIIho4nS';
 const kTickerEndPoint =
     'https://api.polygon.io/v3/reference/tickers?market=stocks&active=true&sort=ticker&order=asc&limit=10&apiKey=$apiKey';
+const kTickerDetailsEndPoint =
+    'https://api.polygon.io/vX/reference/tickers/';
 
 class StockService {
   Future<dynamic> getTickerData() async {
@@ -15,5 +17,12 @@ class StockService {
 
     var tickerData = await networkHelper.getStockData();
     return tickerData;
+  }
+
+  Future<dynamic> getTickerDetails(String ticker) async {
+    NetworkHelper networkHelper = NetworkHelper('$kTickerDetailsEndPoint$ticker?apiKey=$apiKey',);
+
+    var tickerDetails = await networkHelper.getStockData();
+    return tickerDetails;
   }
 }

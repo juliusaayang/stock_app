@@ -3,14 +3,8 @@ import 'package:get_it/get_it.dart';
 import 'pages/loading_screen.dart';
 import 'services/stock_service.dart';
 
-void setUpLocator() {
-  GetIt.I.registerLazySingleton(
-    () => StockService(),
-  );
-}
 
 void main() {
-  setUpLocator();
   runApp(
     MaterialApp(
       home: LoadingScreen(),

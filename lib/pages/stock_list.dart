@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:stock/models/api_response.dart';
 import 'package:stock/models/stock_list.dart';
+import 'package:stock/pages/stock_details.dart';
 import 'package:stock/services/stock_service.dart';
 
 class Stocks extends StatefulWidget {
@@ -23,17 +24,13 @@ class _StocksState extends State<Stocks> {
   int length;
   int index;
 
-  
-  
-    
-
   @override
   void initState() {
-    updateUI(widget.stockData);
+    updateUIForList(widget.stockData);
     super.initState();
   }
 
-  void updateUI(dynamic tickerData) {
+  void updateUIForList(dynamic tickerData) {
     setState(() {
       if (tickerData == null) {
         ticker = 'No value';
@@ -74,6 +71,12 @@ class _StocksState extends State<Stocks> {
                 leading: Text(
                   currencyName,
                 ),
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) {
+                  return StockDetail(
+                    ticker: ticker,
+                  );
+                },),),
               );
             },
             separatorBuilder: (_, __) {
