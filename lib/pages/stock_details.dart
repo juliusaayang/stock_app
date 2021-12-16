@@ -64,7 +64,9 @@ class _StockDetailState extends State<StockDetail> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
+                  CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
                   SizedBox(
                     height: 20,
                   ),

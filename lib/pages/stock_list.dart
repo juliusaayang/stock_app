@@ -56,33 +56,53 @@ class _StocksState extends State<Stocks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: Builder(
         builder: (_) {
           return ListView.separated(
             itemBuilder: (_, index) {
-              return ListTile(
-                title: Text(
-                  tickerName,
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  10,
+                  5,
+                  10,
+                  5,
                 ),
-                subtitle: Text(
-                  ticker,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.red,
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: ListTile(
+                    title: Text(
+                      tickerName,
+                    ),
+                    subtitle: Text(
+                      ticker,
+                    ),
+                    leading: Text(
+                      currencyName.toUpperCase(),
+                      
+                    ),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return StockDetail(
+                            ticker: ticker,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ),
-                leading: Text(
-                  currencyName,
-                ),
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) {
-                  return StockDetail(
-                    ticker: ticker,
-                  );
-                },),),
               );
             },
             separatorBuilder: (_, __) {
-              return Divider(
-                height: 1,
-                color: Colors.blue,
+              return SizedBox(
+                height: 0,
               );
             },
             itemCount: length,
