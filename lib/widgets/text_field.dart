@@ -9,7 +9,7 @@ class TextFieldWidget extends StatelessWidget {
     @required this.controller,
     this.suffixIcon,
     required this.validator,
-    this.obscureText,
+    required this.obscureText,
   });
   final String? hintText;
   final String? title;
@@ -17,7 +17,7 @@ class TextFieldWidget extends StatelessWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final Icon? suffixIcon;
-  bool? obscureText;
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class TextFieldWidget extends StatelessWidget {
             color: Colors.white,
             fontSize: 17,
           ),
-          obscureText: false,
+          obscureText: obscureText,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: GoogleFonts.raleway(

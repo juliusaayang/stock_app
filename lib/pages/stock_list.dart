@@ -17,6 +17,7 @@ class _StocksState extends State<Stocks> {
   StockService stockService = StockService();
   late APIResponse<List<StockListing>> _apiResponse;
   bool _isLoading = false;
+  TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -34,18 +35,30 @@ class _StocksState extends State<Stocks> {
     });
   }
 
+  dynamic _fetchSearchedStocks() async {
+    setState(() {
+      _isLoading = true;
+    });
+    _apiResponse = await stockService.getTickerSearchData(_controller.text);
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final loginProvider = Provider.of<AuthService>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Stocks',
-          style: GoogleFonts.raleway(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: _isLoading
+            ? Container()
+            : Text(
+                'Stocks',
+                style: GoogleFonts.raleway(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
         actions: [
           _isLoading
               ? Container()
@@ -92,76 +105,180 @@ class _StocksState extends State<Stocks> {
 
           if (_apiResponse.error) {
             return Center(
-              child: Text(_apiResponse.errorMessage),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _apiResponse.errorMessage,
+                    style: GoogleFonts.raleway(
+                      fontSize: 20,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1.5,
+                        color: Colors.white,
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    height: 30,
+                    width: 80,
+                    child: Center(
+                      child: InkResponse(
+                        onTap: () => _fetchStocks(),
+                        child: Text(
+                          'refresh',
+                          style: GoogleFonts.raleway(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             );
           }
-          return ListView.separated(
-            itemBuilder: (_, index) {
-              return Padding(
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
                 padding: const EdgeInsets.fromLTRB(
                   10,
-                  5,
                   10,
-                  5,
+                  10,
+                  10,
                 ),
-                child: Container(
-                  padding: EdgeInsets.only(
-                    top: 3,
-                    bottom: 3,
-                    right: 5,
-                    left: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.red,
-                      width: 1.5,
-                    ),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: ListTile(
-                    title: Text(
-                      _apiResponse.data[index].ticker,
-                      style: GoogleFonts.raleway(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        cursorColor: Colors.white,
+                        style: GoogleFonts.raleway(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                        ),
+                        decoration: InputDecoration(
+                          hintStyle: GoogleFonts.raleway(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18,
+                          ),
+                          hintText: 'Search stocks',
+                          filled: true,
+                          fillColor: Colors.grey[800],
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 0,
+                              style: BorderStyle.none,
+                            ),
+                            borderRadius: BorderRadius.circular(13),
+                          ),
+                        ),
                       ),
                     ),
-                    subtitle: Text(
-                      _apiResponse.data[index].tickerName,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.raleway(
-                        fontWeight: FontWeight.w300,
-                        fontSize: 16,
-                      ),
+                    SizedBox(
+                      width: 10,
                     ),
-                    trailing: Text(
-                      _apiResponse.data[index].currency.toUpperCase(),
-                      style: GoogleFonts.raleway(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(
+                          width: 1.5,
+                          color: Colors.red,
+                        ),
                       ),
-                    ),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return StockDetail(
-                            ticker: _apiResponse.data[index].ticker,
-                          );
+                      child: IconButton(
+                        onPressed: () {
+                          _fetchSearchedStocks();
                         },
+                        icon: Icon(
+                          Icons.search,
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              );
-            },
-            separatorBuilder: (_, __) {
-              return SizedBox(
-                height: 0,
-              );
-            },
-            itemCount: _apiResponse.data.length,
+              ),
+              Flexible(
+                child: ListView.separated(
+                  physics: BouncingScrollPhysics(),
+                  itemBuilder: (_, index) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        10,
+                        5,
+                        10,
+                        5,
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.only(
+                          top: 3,
+                          bottom: 3,
+                          right: 5,
+                          left: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.red,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            _apiResponse.data[index].ticker,
+                            style: GoogleFonts.raleway(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          subtitle: Text(
+                            _apiResponse.data[index].tickerName,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.raleway(
+                              fontWeight: FontWeight.w300,
+                              fontSize: 16,
+                            ),
+                          ),
+                          trailing: Text(
+                            _apiResponse.data[index].currency.toUpperCase(),
+                            style: GoogleFonts.raleway(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return StockDetail(
+                                  ticker: _apiResponse.data[index].ticker,
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (_, __) {
+                    return SizedBox(
+                      height: 0,
+                    );
+                  },
+                  itemCount: _apiResponse.data.length,
+                ),
+              ),
+            ],
           );
         },
       ),

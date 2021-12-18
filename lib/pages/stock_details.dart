@@ -157,7 +157,7 @@ class _StockDetailState extends State<StockDetail> {
                     ? Container()
                     : DetailRow(
                         attributes: 'Locale',
-                        results: locale.toString(),
+                        results: locale.toString().toString().toUpperCase(),
                       ),
                 marketCap == null
                     ? Container()
@@ -169,7 +169,7 @@ class _StockDetailState extends State<StockDetail> {
                     ? Container()
                     : DetailRow(
                         attributes: 'Market',
-                        results: market.toString().toUpperCase(),
+                        results: market.toString(),
                       ),
                 outstandingShares == null
                     ? Container()

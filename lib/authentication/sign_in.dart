@@ -17,6 +17,7 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
+  String? error;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -36,6 +37,7 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     final loginProvider = Provider.of<AuthService>(context);
+    error = loginProvider.errorMessage;
     return Scaffold(
       backgroundColor: kThemeColor,
       body: Form(
@@ -171,15 +173,19 @@ class _SignInState extends State<SignIn> {
                   ),
                   child: ListTile(
                     title: Text(
-                      loginProvider.errorMessage,
-                      
+                      error!,
+                      style: GoogleFonts.raleway(
+                        color: kThemeColor,
+                      ),
                     ),
                     leading: Icon(
                       Icons.error,
+                      color: kThemeColor,
                     ),
                     trailing: IconButton(
                       icon: Icon(
                         Icons.close,
+                        color: kThemeColor,
                       ),
                       onPressed: () => loginProvider.setMessage(null),
                     ),

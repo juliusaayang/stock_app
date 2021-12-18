@@ -46,6 +46,44 @@ class StockService {
     );
   }
 
+  Future<APIResponse<List<StockListing>>> getTickerSearchData(String searchStock) {
+    return http
+        .get(
+      Uri.parse('$kTickerSearchEndPoint$searchStock&active=true&sort=ticker&order=asc&limit=20&apiKey=$apiKey'),
+    )
+        .then(
+      (response) {
+        if (response.statusCode == 200) {
+          dynamic jsonData = json.decode(response.body);
+          jsonData = jsonData['results'];
+          final stocks = <StockListing>[];
+          for (var item in jsonData) {
+            StockListing.fromJson(item);
+            stocks.add(
+              StockListing.fromJson(item),
+            );
+          }
+          return APIResponse<List<StockListing>>(
+            data: stocks,
+            error: false,
+            errorMessage: 'an error occured',
+          );
+        }
+        return APIResponse<List<StockListing>>(
+          data: [],
+          error: true,
+          errorMessage: 'an error occured',
+        );
+      },
+    ).catchError(
+      (_) => APIResponse<List<StockListing>>(
+        data: [],
+        error: true,
+        errorMessage: 'an error occured',
+      ),
+    );
+  }
+
   Future<APIResponse<StockDetailsModel>> getStockDetails(String ticker) {
     return http
         .get(
