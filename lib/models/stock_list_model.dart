@@ -4,9 +4,9 @@ class StockListing {
   String currency;
 
   StockListing({
-    this.ticker,
-    this.tickerName,
-    this.currency
+    required this.ticker,
+    required this.tickerName,
+    required this.currency
   });
 
   factory StockListing.fromJson(Map<String, dynamic> item){

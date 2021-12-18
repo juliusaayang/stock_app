@@ -4,8 +4,8 @@ class APIResponse<T> {
   String errorMessage;
 
   APIResponse({
-    this.data,
+    required this.data,
     this.error = false,
-    this.errorMessage,
+    required this.errorMessage,
   });
 }

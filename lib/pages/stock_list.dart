@@ -1,63 +1,100 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:stock/constants/constants.dart';
 import 'package:stock/models/api_response.dart';
-import 'package:stock/models/stock_list.dart';
+import 'package:stock/models/stock_list_model.dart';
 import 'package:stock/pages/stock_details.dart';
+import 'package:stock/services/auth_service.dart';
 import 'package:stock/services/stock_service.dart';
 
 class Stocks extends StatefulWidget {
-  Stocks({this.stockData});
-  final stockData;
-
   @override
   _StocksState createState() => _StocksState();
 }
 
 class _StocksState extends State<Stocks> {
-  StockService stocks = StockService();
-  String ticker;
-  String tickerName;
-  String currencyName;
-  int length;
-  int index;
+  StockService stockService = StockService();
+  late APIResponse<List<StockListing>> _apiResponse;
+  bool _isLoading = false;
 
   @override
   void initState() {
-    updateUIForList(widget.stockData);
+    _fetchStocks();
     super.initState();
   }
 
-  void updateUIForList(dynamic tickerData) {
+  dynamic _fetchStocks() async {
     setState(() {
-      if (tickerData == null) {
-        ticker = 'No value';
-        tickerName = 'No value';
-        currencyName = 'Us';
-        length = 0;
-        return;
-      }
-      var tick = tickerData['results'][0]['ticker'];
-      ticker = tick;
-
-      var name = tickerData['results'][0]['name'];
-      tickerName = name;
-
-      var currency = tickerData['results'][0]['currency_name'];
-      currencyName = currency;
-
-      var count = tickerData['count'];
-      length = count;
+      _isLoading = true;
+    });
+    _apiResponse = await stockService.getTickerData();
+    setState(() {
+      _isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final loginProvider = Provider.of<AuthService>(context);
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Stocks',
+          style: GoogleFonts.raleway(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          _isLoading
+              ? Container()
+              : TextButton(
+                  onPressed: () {
+                    loginProvider.logout();
+                  },
+                  child: Text(
+                    'Log Out',
+                    style: GoogleFonts.raleway(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+          SizedBox(
+            width: 5,
+          ),
+        ],
+      ),
       body: Builder(
         builder: (_) {
+          if (_isLoading) {
+            return Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  Text(
+                    'Loading...',
+                    style: kLoadingText(),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (_apiResponse.error) {
+            return Center(
+              child: Text(_apiResponse.errorMessage),
+            );
+          }
           return ListView.separated(
             itemBuilder: (_, index) {
               return Padding(
@@ -68,6 +105,12 @@ class _StocksState extends State<Stocks> {
                   5,
                 ),
                 child: Container(
+                  padding: EdgeInsets.only(
+                    top: 3,
+                    bottom: 3,
+                    right: 5,
+                    left: 5,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Colors.red,
@@ -77,21 +120,34 @@ class _StocksState extends State<Stocks> {
                   ),
                   child: ListTile(
                     title: Text(
-                      tickerName,
+                      _apiResponse.data[index].ticker,
+                      style: GoogleFonts.raleway(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     subtitle: Text(
-                      ticker,
+                      _apiResponse.data[index].tickerName,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.raleway(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 16,
+                      ),
                     ),
-                    leading: Text(
-                      currencyName.toUpperCase(),
-                      
+                    trailing: Text(
+                      _apiResponse.data[index].currency.toUpperCase(),
+                      style: GoogleFonts.raleway(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) {
                           return StockDetail(
-                            ticker: ticker,
+                            ticker: _apiResponse.data[index].ticker,
                           );
                         },
                       ),
@@ -105,7 +161,7 @@ class _StocksState extends State<Stocks> {
                 height: 0,
               );
             },
-            itemCount: length,
+            itemCount: _apiResponse.data.length,
           );
         },
       ),
