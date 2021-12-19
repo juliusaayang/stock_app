@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:stock/constants/constants.dart';
@@ -18,12 +22,18 @@ class _StocksState extends State<Stocks> {
   late APIResponse<List<StockListing>> _apiResponse;
   bool _isLoading = false;
   TextEditingController _controller = TextEditingController();
+  ConnectivityResult _connctionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
-    _fetchStocks();
     super.initState();
+    _fetchStocks();
+
   }
+
+
 
   dynamic _fetchStocks() async {
     setState(() {
@@ -144,6 +154,7 @@ class _StocksState extends State<Stocks> {
               ),
             );
           }
+          
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [

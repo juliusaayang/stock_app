@@ -47,6 +47,7 @@ class StockService {
   }
 
   Future<APIResponse<List<StockListing>>> getTickerSearchData(String searchStock) {
+    
     return http
         .get(
       Uri.parse('$kTickerSearchEndPoint$searchStock&active=true&sort=ticker&order=asc&limit=20&apiKey=$apiKey'),
