@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:stock/models/api_response.dart';
 import 'package:stock/models/stock_details_model.dart';
 import 'package:stock/models/stock_list_model.dart';
-import 'package:stock/services/stock_service.dart';
 
 class StockService {
   Future<APIResponse<List<StockListing>>> getTickerData() {

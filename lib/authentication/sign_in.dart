@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:stock/authentication/sign_up.dart';
 import 'package:stock/constants/constants.dart';
 import 'package:stock/services/auth_service.dart';
 import 'package:stock/widgets/text_field.dart';

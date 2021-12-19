@@ -3,10 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stock/constants/constants.dart';
-import 'package:stock/pages/stock_list.dart';
 import 'package:stock/services/auth_service.dart';
 import 'package:stock/services/connectivity_provider.dart';
-import 'package:stock/services/stock_service.dart';
 import 'package:stock/widgets/error_custom_widget.dart';
 import 'package:stock/wrapper.dart';
 
